@@ -25,13 +25,21 @@ export default function Cards({ tarefas, responsavelAtivo }) {
   ];
 
   return (
-    <div className="flex max-w-7xl items-center mx-auto py-4 justify-center gap-10">
-      {labels.map((label) => (
-        <div key={label.name} className="min-w-[120px] font-roboto bg-slate-700 text-white p-4 rounded-md shadow-lg flex flex-col items-center justify-center text-center">
-          <h2 className="text-5xl">{label.valor}</h2>
-          <p className="text-xl">{label.name}</p>
+    <div className="flex justify-center py-4">
+      <div className="bg-slate-800 p-4 rounded-lg w-max">
+        <h3 className="text-white text-center font-poppins text-2xl mb-2">
+          {responsavelAtivo || "Geral"}
+        </h3>
+        <div className="flex items-center justify-center gap-10">
+          {labels.map((label) => (
+            <div key={label.name} className="min-w-[120px] font-roboto bg-slate-700 text-white p-4 rounded-md shadow-lg flex flex-col items-center justify-center text-center">
+              <h2 className="text-5xl">{label.valor}</h2>
+              <p className="text-xl">{label.name}</p>
+            </div>
+          ))}
         </div>
-      ))}
+      </div>
     </div>
   );
+
 }
