@@ -80,7 +80,8 @@ export default function TabelaTarefas({ tarefas }) {
     resizable: true,
     filter: true,
     cellStyle: {
-      color: '#000',          // texto preto
+      color: '#000',
+      fontSize: '14px',          
     }
   }), []);
 
@@ -134,7 +135,6 @@ export default function TabelaTarefas({ tarefas }) {
         getRowStyle={getRowStyle}
         pagination
         paginationPageSize={100}
-        sortModel={[{ colId: "vencimento", sort: "asc" }]}
         suppressClickEdit={false}
       />
     </div>

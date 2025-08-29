@@ -6,6 +6,7 @@ import FiltroTarefas from "./components/FiltroTarefas";
 import FiltroStatus from "./components/FiltroStatus";
 import { todasTarefas } from "./data/fakeDB";
 import TabelaTarefas from "./components/TabelaTarefas";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   // Filtros de empresa e tarefa
@@ -40,6 +41,7 @@ function App() {
 
   return (
     <div className="bg-[#181818] min-h-screen text-white">
+      <Toaster position="top-right" />
       <Header
         responsavelAtivo={responsavelAtivo}
         setResponsavelAtivo={setResponsavelAtivo}
