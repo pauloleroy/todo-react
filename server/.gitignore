@@ -27,3 +27,5 @@ build/
 
 # SQL temporários
 sql/seeds
+
+notes.txt
