@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { Dialog } from "@headlessui/react";
-import { todasTarefas, responsaveis } from "../data/fakeDB";
 import toast from "react-hot-toast";
+import { useEmpresas } from "../hooks/useEmpresas";
+import { useTarefas } from "../hooks/useTarefas";
+import { usePessoas } from "../hooks/usePessoas";
+import { useTarefaAvulsa } from "../hooks/useExecucoes";
 
 export default function ModalNovaTarefa() {
   const [isOpen, setIsOpen] = useState(false);
@@ -9,31 +12,16 @@ export default function ModalNovaTarefa() {
   const [tarefa, setTarefa] = useState("");
   const [vencimento, setVencimento] = useState("");
   const [responsavel, setResponsavel] = useState("");
-  const [mesRef, setMesRef] = useState(""); // obrigatório
-  const [obs, setObs] = useState("");       // opcional
+  const [mesRef, setMesRef] = useState("");
+  const [obs, setObs] = useState("");
 
-  // Arrays únicos
-  const empresasUnicas = [...new Set(todasTarefas.map(t => t.empresa))];
-  const tarefasUnicas = [...new Set(todasTarefas.map(t => t.tarefa))];
+  const { empresas } = useEmpresas(); // hook correto para empresas
+  const { tarefasUnicas } = useTarefas(); // hook tarefas
+  const { pessoas } = usePessoas();
+  const { addTarefa, loading } = useTarefaAvulsa();
 
-  const [empresasFiltradas, setEmpresasFiltradas] = useState(empresasUnicas);
-  const [tarefasFiltradas, setTarefasFiltradas] = useState(tarefasUnicas);
-
-  const handleEmpresaChange = (e) => {
-    const valor = e.target.value;
-    setEmpresa(valor);
-    setEmpresasFiltradas(
-      empresasUnicas.filter(emp => emp.toLowerCase().includes(valor.toLowerCase()))
-    );
-  };
-
-  const handleTarefaChange = (e) => {
-    const valor = e.target.value;
-    setTarefa(valor);
-    setTarefasFiltradas(
-      tarefasUnicas.filter(t => t.toLowerCase().includes(valor.toLowerCase()))
-    );
-  };
+  const [empresaFocus, setEmpresaFocus] = useState(false);
+  const [tarefaFocus, setTarefaFocus] = useState(false);
 
   const resetForm = () => {
     setEmpresa("");
@@ -49,49 +37,54 @@ export default function ModalNovaTarefa() {
     setIsOpen(false);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Validação básica
     if (!empresa || !tarefa || !responsavel || !mesRef || !vencimento) {
-      alert("Preencha todos os campos obrigatórios!");
+      toast.error("Preencha todos os campos obrigatórios!");
       return;
     }
 
-    // Validar mesRef (AAAA-MM)
-    if (!/^\d{4}-\d{2}$/.test(mesRef)) {
-      alert("Mês referência inválido! Use o formato AAAA-MM.");
-      return;
-    }
-
-    // Validar vencimento
-    const dataVenc = new Date(vencimento);
-    if (isNaN(dataVenc.getTime())) {
-      alert("Data de vencimento inválida!");
-      return;
-    }
-
-    // Criar objeto da nova tarefa
     const novaTarefa = {
-      empresa,
-      tarefa,
-      vencimento: dataVenc.toISOString().slice(0, 10), // YYYY-MM-DD
-      responsavel,
-      mesRef,
+      empresa_nome: empresa,
+      tarefa_nome: tarefa,
+      vencimento,
+      responsavel_id: responsavel,
+      mes_ref: `${mesRef}-01`,
       obs,
-      status: "Em aberto",
+      status: "Em aberto"
     };
 
-    console.log("Nova tarefa:", novaTarefa);
-    toast.success("Tarefa adicionada!", {
-      duration: 3000,
-      style: { background: "#22c55e", color: "#fff" },
-    });
-
-    // Resetar campos e fechar modal
-    resetForm();
-    setIsOpen(false);
+    const res = await addTarefa(novaTarefa);
+    if (res.success) {
+      toast.success("Tarefa adicionada!");
+      handleClose();
+      setTimeout(() => {
+        window.location.reload(); // recarrega a página
+      }, 200); // pequeno delay para o toast aparecer antes
+    } else {
+      toast.error(res.message || "Erro ao adicionar tarefa");
+    }
   };
+
+  // Funções de seleção igual ao filtro
+  const selectEmpresa = (valor) => {
+    setEmpresa(valor);
+    setEmpresaFocus(false);
+  };
+
+  const selectTarefa = (valor) => {
+    setTarefa(valor);
+    setTarefaFocus(false);
+  };
+
+  // Filtra as opções conforme input
+  const filtroEmpresas = (empresas || []).filter(e =>
+    e.nome.toLowerCase().includes(empresa.toLowerCase())
+  );
+
+  const filtroTarefas = (tarefasUnicas || []).filter(t =>
+    t.toLowerCase().includes(tarefa.toLowerCase())
+  );
 
   return (
     <div>
@@ -102,51 +95,60 @@ export default function ModalNovaTarefa() {
         Nova Tarefa
       </button>
 
-      <Dialog open={isOpen} onClose={handleClose} className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <Dialog
+        open={isOpen}
+        onClose={handleClose}
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+      >
         <Dialog.Panel className="bg-gray-800 p-6 rounded-lg w-96">
           <Dialog.Title className="text-2xl text-white mb-4">Nova Tarefa</Dialog.Title>
 
           <form className="flex flex-col gap-3" onSubmit={handleSubmit}>
-            {/* Input empresa */}
+
+            {/* Empresa */}
             <div className="relative">
               <input
                 value={empresa}
-                onChange={handleEmpresaChange}
+                onChange={e => setEmpresa(e.target.value)}
+                onFocus={() => setEmpresaFocus(true)}
+                onBlur={() => setTimeout(() => setEmpresaFocus(false), 150)}
                 placeholder="Digite ou selecione a empresa"
                 required
                 className="p-2 rounded text-black w-full"
               />
-              {empresa && empresasFiltradas.length > 0 && (
+              {empresaFocus && filtroEmpresas.length > 0 && (
                 <ul className="absolute bg-white text-black w-full rounded shadow-lg max-h-40 overflow-y-auto z-10">
-                  {empresasFiltradas.map((emp) => (
+                  {filtroEmpresas.map(emp => (
                     <li
-                      key={emp}
+                      key={emp.id}
                       className="p-2 hover:bg-blue-500 hover:text-white cursor-pointer"
-                      onClick={() => setEmpresa(emp)}
+                      onMouseDown={() => selectEmpresa(emp.nome)}
                     >
-                      {emp}
+                      {emp.nome}
                     </li>
                   ))}
                 </ul>
               )}
             </div>
 
-            {/* Input tarefa */}
+            {/* Tarefa */}
             <div className="relative">
               <input
                 value={tarefa}
-                onChange={handleTarefaChange}
+                onChange={e => setTarefa(e.target.value)}
+                onFocus={() => setTarefaFocus(true)}
+                onBlur={() => setTimeout(() => setTarefaFocus(false), 150)}
                 placeholder="Digite ou selecione a tarefa"
                 required
                 className="p-2 rounded text-black w-full"
               />
-              {tarefa && tarefasFiltradas.length > 0 && (
+              {tarefaFocus && filtroTarefas.length > 0 && (
                 <ul className="absolute bg-white text-black w-full rounded shadow-lg max-h-40 overflow-y-auto z-10">
-                  {tarefasFiltradas.map((t) => (
+                  {filtroTarefas.map(t => (
                     <li
                       key={t}
                       className="p-2 hover:bg-blue-500 hover:text-white cursor-pointer"
-                      onClick={() => setTarefa(t)}
+                      onMouseDown={() => selectTarefa(t)}
                     >
                       {t}
                     </li>
@@ -155,41 +157,42 @@ export default function ModalNovaTarefa() {
               )}
             </div>
 
-            {/* Input mês referência */}
+            {/* Mês referência */}
             <input
               type="month"
               value={mesRef}
-              onChange={(e) => setMesRef(e.target.value)}
+              onChange={e => setMesRef(e.target.value)}
               required
-              placeholder="AAAA-MM"
               className="p-2 rounded text-black w-full"
             />
 
-            {/* Input vencimento */}
+            {/* Vencimento */}
             <input
               type="date"
               value={vencimento}
-              onChange={(e) => setVencimento(e.target.value)}
+              onChange={e => setVencimento(e.target.value)}
               required
               className="p-2 rounded text-black w-full"
             />
 
-            {/* Select responsável */}
+            {/* Responsável */}
             <select
               value={responsavel}
-              onChange={(e) => setResponsavel(e.target.value)}
+              onChange={e => setResponsavel(e.target.value)}
               required
               className="p-2 rounded text-black w-full"
             >
               <option value="">Selecione o responsável</option>
-              {responsaveis.map((r) => <option key={r} value={r}>{r}</option>)}
+              {pessoas.map(p => (
+                <option key={p.id} value={p.id}>{p.nome}</option>
+              ))}
             </select>
 
-            {/* Input obs opcional */}
+            {/* Observações */}
             <input
               type="text"
               value={obs}
-              onChange={(e) => setObs(e.target.value)}
+              onChange={e => setObs(e.target.value)}
               placeholder="Observações (opcional)"
               className="p-2 rounded text-black w-full"
             />
@@ -204,11 +207,13 @@ export default function ModalNovaTarefa() {
               </button>
               <button
                 type="submit"
+                disabled={loading}
                 className="px-4 py-2 rounded bg-blue-500 hover:bg-blue-600 text-white"
               >
-                Adicionar
+                {loading ? "Salvando..." : "Adicionar"}
               </button>
             </div>
+
           </form>
         </Dialog.Panel>
       </Dialog>

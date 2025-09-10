@@ -1,0 +1,30 @@
+# Node
+node_modules/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment
+.env
+
+# Editor files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.sw?
+
+# Build outputs
+dist/
+build/
+
+# Cache
+.cache/
+
+# SQL temporários
+notes.txt
+insert_tarefas_empresa_resp.sql

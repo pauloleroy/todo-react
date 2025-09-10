@@ -4,22 +4,22 @@ import Cards from "./components/Cards";
 import ModalNovaTarefa from "./components/ModalNovaTarefa";
 import FiltroTarefas from "./components/FiltroTarefas";
 import FiltroStatus from "./components/FiltroStatus";
-import { todasTarefas } from "./data/fakeDB";
 import TabelaTarefas from "./components/TabelaTarefas";
 import { Toaster } from "react-hot-toast";
+import { useExecucoes } from "./hooks/useExecucoes";
+import { getMesAtual } from "./utils/date";
 
 function App() {
-  // Filtros de empresa e tarefa
+  const mesAtual = getMesAtual(); // ajustar mês atual
+  const { execucoes, loading, refresh } = useExecucoes(mesAtual);
+
+  // Filtros
   const [filtros, setFiltros] = useState({ empresa: "", tarefa: "" });
-
-  // Filtros de status
   const [statusSelecionados, setStatusSelecionados] = useState(["Em aberto", "Urgente"]);
-
-  // Responsáveis
   const [responsavelAtivo, setResponsavelAtivo] = useState(null); // null = todos
 
-  // Filtro das tarefas
-  const tarefasFiltradas = todasTarefas.filter((t) => {
+  // Filtra execuções
+  const tarefasFiltradas = execucoes.filter((t) => {
     const statusOk = statusSelecionados.includes(t.status);
     const empresaOk = !filtros.empresa || t.empresa.toLowerCase().includes(filtros.empresa.toLowerCase());
     const tarefaOk = !filtros.tarefa || t.tarefa.toLowerCase().includes(filtros.tarefa.toLowerCase());
@@ -27,31 +27,21 @@ function App() {
     return statusOk && empresaOk && tarefaOk && responsavelOk;
   });
 
-  // Limpar filtros (status e empresa)
   const limparFiltros = () => {
     setFiltros({ empresa: "", tarefa: "" });
-    setStatusSelecionados(["Em aberto", "Urgente"]); // padrão inicial
+    setStatusSelecionados(["Em aberto", "Urgente"]);
   };
-  console.log("[App] filtros:", filtros);
-  console.log("[App] statusSelecionados:", statusSelecionados);
-  console.log("[App] responsavelAtivo:", responsavelAtivo);
-  console.log("[App] tarefasFiltradas length:", tarefasFiltradas.length);
-  console.log("[App] tarefasFiltradas sample:", tarefasFiltradas.slice(0, 2));
-
 
   return (
     <div className="bg-[#181818] min-h-screen text-white">
       <Toaster position="top-right" />
-      <Header
-        responsavelAtivo={responsavelAtivo}
-        setResponsavelAtivo={setResponsavelAtivo}
-      />
-      
-      <Cards tarefas={todasTarefas} responsavelAtivo={responsavelAtivo} />
+
+      <Header responsavelAtivo={responsavelAtivo} setResponsavelAtivo={setResponsavelAtivo} />
+      <Cards tarefas={execucoes} responsavelAtivo={responsavelAtivo} />
 
       {/* Controles */}
       <div className="flex max-w-7xl items-center mx-auto py-4 justify-between gap-4 flex-wrap">
-        <ModalNovaTarefa />
+        <ModalNovaTarefa refresh={refresh} />
         <FiltroStatus statusAtivos={statusSelecionados} onStatusChange={setStatusSelecionados} />
         <FiltroTarefas
           placeholderEmpresa="Filtre por empresa"
@@ -69,7 +59,11 @@ function App() {
 
       {/* Tabela de tarefas */}
       <div className="max-w-7xl mx-auto mt-6">
-        <TabelaTarefas tarefas={tarefasFiltradas} />
+        {loading ? (
+          <p>Carregando tarefas...</p>
+        ) : (
+          <TabelaTarefas tarefas={tarefasFiltradas} refresh={refresh} />
+        )}
       </div>
     </div>
   );
