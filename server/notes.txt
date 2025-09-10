@@ -1,4 +1,0 @@
-Arrumar no front
-- adcionar tarefas recorrentes ao banco
-- adicionar front de inserir novo mes
-- fazer autenticacao para deploy
