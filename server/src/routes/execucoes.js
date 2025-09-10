@@ -1,7 +1,10 @@
 import express from "express";
 import pool from "../db/pool.js";
+import authMiddleware from "../middlewares/requireAuth.js";
 
 const router = express.Router();
+
+router.use(authMiddleware);
 
 // 1. PATCH em execuções
 router.patch("/:id", async (req, res, next) => {

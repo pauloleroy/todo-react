@@ -1,7 +1,10 @@
 import express from "express";
 import pool from "../db/pool.js";
+import authMiddleware from "../middlewares/requireAuth.js";
 
 const router = express.Router();
+
+router.use(authMiddleware);
 
 // GET /api/pessoas
 router.get("/", async (req, res, next) => {
