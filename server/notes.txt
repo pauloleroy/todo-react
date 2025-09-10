@@ -1,0 +1,14 @@
+Endpoints
+
+- Get empresas
+- Get pessoas
+- Patch em execuções para Status, vencimento, obs e responsável
+- Post de renderização das execuções a cada atualização de dados para popular a tabela.
+- Post de tarefas avulsas na tabela execuções
+- Post mensal, que cria tabelas de acordo com as regras na db
+
+Arrumar no front
+- adcionar tarefas recorrentes ao banco
+- adicionar front de inserir novo mes
+- organizar queries
+- fazer autenticacao para deploy

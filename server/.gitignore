@@ -26,5 +26,4 @@ build/
 .cache/
 
 # SQL temporários
-notes.txt
-insert_tarefas_empresa_resp.sql
+sql/seeds
