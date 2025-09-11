@@ -8,6 +8,7 @@ import TabelaTarefas from "../components/TabelaTarefas";
 import { Toaster } from "react-hot-toast";
 import { useExecucoes } from "../hooks/useExecucoes";
 import { getMesAtual } from "../utils/date";
+import GerarMesAdmin from "../components/GerarMesAdmin";
 
 function Dash() {
   const mesAtual = getMesAtual(); // ajustar mês atual
@@ -65,6 +66,16 @@ function Dash() {
           <TabelaTarefas tarefas={tarefasFiltradas} refresh={refresh} />
         )}
       </div>
+      
+      {/* Gerar mes admin */}
+      <div className="max-w-7xl mx-auto mt-6">
+        <GerarMesAdmin 
+          role={localStorage.getItem("role")} 
+          refresh={refresh} 
+          execucoes={execucoes} // <-- passa aqui
+        />
+      </div>
+
     </div>
   );
 }

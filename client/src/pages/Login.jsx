@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 
-function Login() {
+function Login({ setToken }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -20,16 +20,16 @@ function Login() {
       });
 
       const data = await res.json();
-
       if (!res.ok) throw new Error(data.message || "Erro no login");
 
-      // salva token e role no localStorage
-      localStorage.setItem("token", data.token);
+      // salva token no estado (reativo)
+      setToken(data.token);
+
+      // role ainda pode ir no localStorage
       localStorage.setItem("role", data.user.role);
 
       toast.success("Login realizado com sucesso!");
-      navigate("/dashboard"); // redireciona para dashboard
-
+      navigate("/dashboard");
     } catch (err) {
       console.error(err);
       toast.error(err.message || "Erro ao fazer login");

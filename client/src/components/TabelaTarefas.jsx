@@ -30,7 +30,7 @@ export default function TabelaTarefas({ tarefas }) {
   const columnDefs = useMemo(() => [
     { headerName: "ID", field: "id", width: 90 },
     {
-      headerName: "MES_REF",
+      headerName: "MES_TAR",
       field: "mes_ref",
       width: 120,
       valueGetter: (params) => formatMesRef(params.data.mes_ref),

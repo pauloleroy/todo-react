@@ -5,6 +5,7 @@ import { useEmpresas } from "../hooks/useEmpresas";
 import { useTarefas } from "../hooks/useTarefas";
 import { usePessoas } from "../hooks/usePessoas";
 import { useTarefaAvulsa } from "../hooks/useExecucoes";
+import { getMesAtual } from "../utils/date";
 
 export default function ModalNovaTarefa() {
   const [isOpen, setIsOpen] = useState(false);
@@ -12,7 +13,6 @@ export default function ModalNovaTarefa() {
   const [tarefa, setTarefa] = useState("");
   const [vencimento, setVencimento] = useState("");
   const [responsavel, setResponsavel] = useState("");
-  const [mesRef, setMesRef] = useState("");
   const [obs, setObs] = useState("");
 
   const { empresas } = useEmpresas(); // hook correto para empresas
@@ -28,7 +28,6 @@ export default function ModalNovaTarefa() {
     setTarefa("");
     setVencimento("");
     setResponsavel("");
-    setMesRef("");
     setObs("");
   };
 
@@ -39,7 +38,7 @@ export default function ModalNovaTarefa() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!empresa || !tarefa || !responsavel || !mesRef || !vencimento) {
+    if (!empresa || !tarefa || !responsavel || !vencimento) {
       toast.error("Preencha todos os campos obrigatórios!");
       return;
     }
@@ -49,7 +48,7 @@ export default function ModalNovaTarefa() {
       tarefa_nome: tarefa,
       vencimento,
       responsavel_id: responsavel,
-      mes_ref: `${mesRef}-01`,
+      mes_ref: getMesAtual(), // pega automaticamente o mês atual
       obs,
       status: "Em aberto"
     };
@@ -58,9 +57,7 @@ export default function ModalNovaTarefa() {
     if (res.success) {
       toast.success("Tarefa adicionada!");
       handleClose();
-      setTimeout(() => {
-        window.location.reload(); // recarrega a página
-      }, 200); // pequeno delay para o toast aparecer antes
+      setTimeout(() => window.location.reload(), 200);
     } else {
       toast.error(res.message || "Erro ao adicionar tarefa");
     }
@@ -156,15 +153,6 @@ export default function ModalNovaTarefa() {
                 </ul>
               )}
             </div>
-
-            {/* Mês referência */}
-            <input
-              type="month"
-              value={mesRef}
-              onChange={e => setMesRef(e.target.value)}
-              required
-              className="p-2 rounded text-black w-full"
-            />
 
             {/* Vencimento */}
             <input

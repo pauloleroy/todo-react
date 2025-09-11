@@ -16,12 +16,8 @@ export function formatMesRef(value) {
   return `${ano}-${mes}`; // YYYY-MM
 }
 
+
 export function formatVencimento(value) {
   if (!value) return "";
-  const d = new Date(value);
-  if (isNaN(d)) return value;
-  const ano = d.getFullYear();
-  const mes = String(d.getMonth() + 1).padStart(2, "0");
-  const dia = String(d.getDate()).padStart(2, "0");
-  return `${ano}-${mes}-${dia}`; // YYYY-MM-DD
+  return value.slice(0, 10); // pega apenas YYYY-MM-DD
 }

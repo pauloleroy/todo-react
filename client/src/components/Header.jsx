@@ -1,9 +1,12 @@
 import Logo from '../assets/img/logo-jpc.PNG';
 import BotaoHeader from './BotaoHeader';
-import { responsaveis } from '../data/fakeDB';
+import { usePessoas } from '../hooks/usePessoas';
 
 export default function Header({ responsavelAtivo, setResponsavelAtivo }) {
-  const nomeBotoes = ["Geral", ...responsaveis];
+  const { pessoas } = usePessoas();
+
+  // Botões: "Geral" + todos os nomes das pessoas
+  const nomeBotoes = ["Geral", ...pessoas.map(p => p.nome)];
 
   const handleClick = (name) => {
     if (name === "Geral") {
@@ -31,4 +34,3 @@ export default function Header({ responsavelAtivo, setResponsavelAtivo }) {
     </header>
   );
 }
-
