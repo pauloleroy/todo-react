@@ -1,29 +1,32 @@
-// hooks/usePessoas.js
-import { useState, useEffect } from "react";
-
-const API_BASE = import.meta.env.VITE_API_URL;
+// src/hooks/usePessoas.js
+import { useState, useEffect, useCallback } from "react";
+import { apiFetch } from "../utils/api.js"; // envia token automaticamente
 
 export function usePessoas() {
   const [pessoas, setPessoas] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const fetchPessoas = async () => {
+  const fetchPessoas = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${API_BASE}/pessoas`);
-      const data = await res.json();
-      if (data.success) setPessoas(data.data);
-      else setError(data.message);
+      const data = await apiFetch("/pessoas");
+      if (data.success) {
+        setPessoas(data.data);
+      } else {
+        setError(data.message || "Erro ao buscar pessoas");
+      }
     } catch (err) {
-      setError(err.message || "Erro ao buscar pessoas");
+      setError(err.message || "Erro inesperado");
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  useEffect(() => { fetchPessoas(); }, []);
+  useEffect(() => {
+    fetchPessoas();
+  }, [fetchPessoas]);
 
   return { pessoas, loading, error, refresh: fetchPessoas };
 }

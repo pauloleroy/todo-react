@@ -1,6 +1,6 @@
+// src/hooks/useEmpresas.js
 import { useState, useEffect } from "react";
-
-const API_BASE = import.meta.env.VITE_API_URL;
+import { apiFetch } from "../utils/api.js";
 
 export function useEmpresas() {
   const [empresas, setEmpresas] = useState([]);
@@ -11,10 +11,12 @@ export function useEmpresas() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${API_BASE}/empresas`);
-      const data = await res.json();
-      if (data.success) setEmpresas(data.data);
-      else setError(data.message);
+      const data = await apiFetch("/empresas"); // apiFetch já envia o token
+      if (data.success) {
+        setEmpresas(data.data);
+      } else {
+        setError(data.message || "Erro ao buscar empresas");
+      }
     } catch (err) {
       setError(err.message || "Erro ao buscar empresas");
     } finally {
@@ -22,7 +24,10 @@ export function useEmpresas() {
     }
   };
 
-  useEffect(() => { fetchEmpresas(); }, []);
+  useEffect(() => {
+    fetchEmpresas();
+  }, []);
 
   return { empresas, loading, error, refresh: fetchEmpresas };
 }
+

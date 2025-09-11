@@ -60,8 +60,11 @@ router.post("/render", async (req, res, next) => {
       LEFT JOIN tarefas t ON et.tarefa_id = t.id
       LEFT JOIN pessoas p ON e.responsavel_id = p.id
       WHERE 
-        (e.status != 'Concluído')
-        OR (e.status = 'Concluído' AND e.mes_ref >= ($1::date - interval '2 months'))
+        e.status != 'Concluído'
+        OR (
+          e.status = 'Concluído' 
+          AND date_trunc('month', e.mes_ref) >= date_trunc('month', $1::date) - interval '2 months'
+        )
       ORDER BY e.vencimento ASC
       `,
       [mesAtual]

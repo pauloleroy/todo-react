@@ -1,37 +1,34 @@
-const API_BASE = import.meta.env.VITE_API_URL; // Vite
+// client/src/api/execucoes.js
+import { apiFetch } from "../utils/api.js";
 
-export async function fetchExecucoes(mesAtual) {
-  const res = await fetch(`${API_BASE}/execucoes/render`, {
+export const fetchExecucoes = (mesAtual) =>
+  apiFetch("/execucoes/render", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ mesAtual }),
   });
-  return res.json();
-}
 
-export async function postTarefaAvulsa(tarefa) {
-  const res = await fetch(`${API_BASE}/execucoes/avulsa`, {
+export const postTarefaAvulsa = (tarefa) =>
+  apiFetch("/execucoes/avulsa", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(tarefa),
   });
-  return res.json();
-}
 
-export async function gerarExecucoesMensal(mesNovo) {
-  const res = await fetch(`${API_BASE}/execucoes/mensal`, {
+export const gerarExecucoesMensal = (mesNovo) =>
+  apiFetch("/execucoes/mensal", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ mesNovo }),
   });
-  return res.json();
-}
 
-export async function patchExecucao(id, data) {
-  const res = await fetch(`${API_BASE}/execucoes/${id}`, {
+export const patchExecucao = (id, data) =>
+  apiFetch(`/execucoes/${id}`, {
     method: "PATCH",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
-  return res.json();
-}
+
+// Empresas e Pessoas
+export const fetchEmpresas = () => apiFetch("/empresas");
+export const fetchPessoas = () => apiFetch("/pessoas");
+
+// Tarefas
+export const fetchTarefas = (mes) =>
+  apiFetch(`/tarefas?mesAtual=${mes}`);

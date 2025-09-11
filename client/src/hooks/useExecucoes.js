@@ -1,23 +1,18 @@
+// client/src/hooks/useExecucoes.js
 import { useState, useEffect, useCallback } from "react";
-import {
-  fetchExecucoes,
-  postTarefaAvulsa,
-  gerarExecucoesMensal,
-  patchExecucao
-} from "../api/execucoes";
+import { fetchExecucoes, patchExecucao, postTarefaAvulsa, gerarExecucoesMensal } from "../api/execucoes.js";
 
-// Hook principal para pegar execuções do mês
+// Hook principal
 export function useExecucoes(mesAtual) {
   const [execucoes, setExecucoes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const fetchData = useCallback(async () => {
+  const refresh = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
       const data = await fetchExecucoes(mesAtual);
-      console.log("Dados recebidos do backend:", data);
       if (data.success) setExecucoes(data.data);
       else setError(data.message || "Erro ao buscar execuções");
     } catch (err) {
@@ -27,12 +22,12 @@ export function useExecucoes(mesAtual) {
     }
   }, [mesAtual]);
 
-  useEffect(() => { fetchData(); }, [fetchData]);
+  useEffect(() => { refresh(); }, [refresh]);
 
-  return { execucoes, loading, error, refresh: fetchData };
+  return { execucoes, loading, error, refresh };
 }
 
-// Hook para atualizar execução individual
+// Hook para alterar execução
 export function useUpdateExecucao() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -55,7 +50,7 @@ export function useUpdateExecucao() {
   return { updateExecucao, loading, error };
 }
 
-// Hook para criar tarefa avulsa
+// Hook pra adicionar tarefa avulsa
 export function useTarefaAvulsa() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -78,7 +73,7 @@ export function useTarefaAvulsa() {
   return { addTarefa, loading, error };
 }
 
-// Hook para gerar execuções do mês
+// Hook pra gerar execuções do mês
 export function useGerarExecucoesMensal() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
