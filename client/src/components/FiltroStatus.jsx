@@ -4,7 +4,7 @@ export default function FiltroStatus({ statusAtivos, onStatusChange }) {
   // Status disponíveis
   const statusOptions = [
     { label: "Em aberto", color: "bg-blue-500" },
-    { label: "Urgente", color: "bg-red-500" },
+    { label: "Urgente", color: "bg-[#ffb86b]" },
     { label: "Concluído", color: "bg-green-500" },
   ];
 

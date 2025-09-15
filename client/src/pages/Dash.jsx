@@ -9,8 +9,11 @@ import { Toaster } from "react-hot-toast";
 import { useExecucoes } from "../hooks/useExecucoes";
 import { getMesAtual } from "../utils/date";
 import GerarMesAdmin from "../components/GerarMesAdmin";
+import { useAuth } from "../hooks/useAuth";
 
 function Dash() {
+  const token = localStorage.getItem("token");
+  useAuth(token);
   const mesAtual = getMesAtual(); // ajustar mês atual
   const { execucoes, loading, refresh } = useExecucoes(mesAtual);
 
