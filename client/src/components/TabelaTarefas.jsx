@@ -5,6 +5,7 @@ import { usePessoas } from "../hooks/usePessoas";
 import { useUpdateExecucao } from "../hooks/useExecucoes";
 import { formatVencimento, formatMesRef } from "../utils/date";
 import { toast } from "react-hot-toast";
+import { toLocalDate } from "../utils/date";
 
 // Registrar módulos do ag-grid
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -80,10 +81,9 @@ export default function TabelaTarefas({ tarefas }) {
     if (status === "Concluído") return { backgroundColor: "#22c55e", color: "#fff" };
     if (!vencimento) return status === "Urgente" ? { backgroundColor: "#ffb86b", color: "#000" } : {};
 
-    const v = new Date(vencimento);
-    if (isNaN(v)) return status === "Urgente" ? { backgroundColor: "#ffb86b", color: "#000" } : {};
+    const v = toLocalDate(vencimento);
     v.setHours(0,0,0,0);
-
+    if (isNaN(v)) return status === "Urgente" ? { backgroundColor: "#ffb86b", color: "#000" } : {};
     if (status === "Urgente") return { backgroundColor: "#ffb86b", color: "#000" };
     if (v < hoje && status !== "Concluído") return { backgroundColor: "#f87171", color: "#000" };
     const diffDias = Math.ceil((v-hoje)/(1000*60*60*24));

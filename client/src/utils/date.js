@@ -20,3 +20,14 @@ export function formatVencimento(value) {
   if (!value) return "";
   return value.slice(0, 10); // pega apenas YYYY-MM-DD
 }
+
+export function toLocalDate(value) {
+  if (!value) return null;
+
+  if (value instanceof Date) return new Date(value.getFullYear(), value.getMonth(), value.getDate());
+
+  // garante string YYYY-MM-DD
+  const str = value.toString().slice(0, 10); 
+  const [ano, mes, dia] = str.split("-").map(Number);
+  return new Date(ano, mes - 1, dia);
+}
