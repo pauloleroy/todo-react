@@ -70,14 +70,15 @@ function Dash() {
         )}
       </div>
       
-      {/* Gerar mes admin */}
-      <div className="max-w-7xl mx-auto mt-6">
-        <GerarMesAdmin 
-          role={localStorage.getItem("role")} 
-          refresh={refresh} 
-          execucoes={execucoes} // <-- passa aqui
-        />
-      </div>
+      {localStorage.getItem("role") === "admin" && (
+        <div className="max-w-7xl mx-auto mt-6">
+          <GerarMesAdmin 
+            role={localStorage.getItem("role")} 
+            refresh={refresh} 
+            execucoes={execucoes} 
+          />
+        </div>
+      )}
 
     </div>
   );
