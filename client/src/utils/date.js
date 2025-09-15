@@ -1,20 +1,19 @@
 // utils/date.js
 export function getMesAtual() {
   const hoje = new Date();
-  // Garante que é o primeiro dia do mês
-  const mesAtual = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
-  // Retorna em formato YYYY-MM-DD
-  return mesAtual.toISOString().slice(0, 10);
+  const ano = hoje.getFullYear();
+  const mes = String(hoje.getMonth() + 1).padStart(2, "0");
+  return `${ano}-${mes}-01`; // primeiro dia do mês local
 }
+
 // utils/date.js
 export function formatMesRef(value) {
   if (!value) return "";
-  const d = new Date(value);
-  if (isNaN(d)) return value;
-  const ano = d.getFullYear();
-  const mes = String(d.getMonth() + 1).padStart(2, "0");
-  return `${ano}-${mes}`; // YYYY-MM
+  // assume value no formato YYYY-MM-DD
+  const [ano, mes] = value.split("-");
+  return `${ano}-${mes}`;
 }
+
 
 
 export function formatVencimento(value) {
